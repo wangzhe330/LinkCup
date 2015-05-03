@@ -12,6 +12,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.SensorManager;
+import android.support.v4.app.FragmentManager;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.example.wz.linkcup.MainActivity;
 import com.example.wz.linkcup.R;
 
 import java.util.ArrayList;

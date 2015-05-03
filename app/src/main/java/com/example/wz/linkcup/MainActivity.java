@@ -2,12 +2,14 @@ package com.example.wz.linkcup;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +18,15 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import library.FloatingActionButton;
 import library.FloatingActionMenu;
@@ -36,6 +47,7 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private int fragment_rec = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +114,7 @@ public class MainActivity extends ActionBarActivity
             fragmentManager.beginTransaction()
                   .replace(R.id.container, new FloatingLinkFragment())
                   .commit();
+            fragment_rec=1;
         }
     }
     class FloatingStateButtonClickListener implements View.OnClickListener{
@@ -111,6 +124,7 @@ public class MainActivity extends ActionBarActivity
             fragmentManager.beginTransaction()
                     .replace(R.id.container,new FloatingStateFragment() )
                     .commit();
+            fragment_rec=2;
         }
     }
     class FloatingRecordButtonClickListener implements View.OnClickListener{
@@ -120,8 +134,46 @@ public class MainActivity extends ActionBarActivity
             fragmentManager.beginTransaction()
                     .replace(R.id.container,new FloatingRecordFragment() )
                     .commit();
+            fragment_rec=3;
         }
     }
+    /*
+    @Override
+    public void onBackPressed(){
+        //super.onBackPressed();
+        if(fragment_rec!=0){
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container,new PlaceholderFragment() )
+                    .commit();
+            fragment_rec=0;
+        }
+    }*/
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            System.out.println("onKeyDown()");
+            if(fragment_rec!=0) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new FloatingLinkFragment())
+                        .commit();
+
+                fragment_rec = 0;
+            }
+            return false;
+        }else {
+            return super.onKeyDown(keyCode, event);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("onDestroy()");
+    }
+
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -213,8 +265,8 @@ public class MainActivity extends ActionBarActivity
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            Button bn = (Button) rootView.findViewById(R.id.button_test);
-            bn.setText("ok");
+            //Button bn = (Button) rootView.findViewById(R.id.button_test);
+            //bn.setText("ok");
             return rootView;
         }
 
@@ -237,6 +289,7 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_floating_link, container, false);
+
             return rootView;
         }
     }
@@ -259,7 +312,95 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_floating_record, container, false);
+
+            //wz line chart
+            LineChart chart = (LineChart)rootView.findViewById(R.id.chart);
+
+            //chart.setDescription("water of today");
+            //chart.setDrawBorders( true );
+            //chart.invalidate();
+            //LineData water_data = getLineData(36,100);
+            LineData mLineData = getLineData(24, 100);
+            showChart(chart, mLineData, Color.rgb(26, 188, 156));//rgb(26, 188, 156)rgb(114, 188, 223)
+
+
             return rootView;
+        }
+        //set style
+        private void showChart(LineChart lineChart, LineData lineData, int color) {
+            lineChart.setDrawBorders(false);
+
+            // no description text
+            lineChart.setDescription("");
+
+            lineChart.setNoDataTextDescription("You need to provide data for the chart.");
+
+            // enable / disable grid background
+            lineChart.setDrawGridBackground(false); //
+            lineChart.setGridBackgroundColor(Color.WHITE & 0x70FFFFFF);
+
+            // enable touch gestures
+            lineChart.setTouchEnabled(true);
+
+            // enable scaling and dragging
+            lineChart.setDragEnabled(true);
+            lineChart.setScaleEnabled(true);
+
+            // if disabled, scaling can be done on x- and y-axis separately
+            lineChart.setPinchZoom(false);//
+
+            lineChart.setBackgroundColor(color);
+
+            // add data
+            lineChart.setData(lineData);
+
+            // get the legend (only possible after setting data)
+            Legend mLegend = lineChart.getLegend();
+
+            // modify the legend ...
+            // mLegend.setPosition(LegendPosition.LEFT_OF_CHART);
+            mLegend.setForm(Legend.LegendForm.CIRCLE);
+            mLegend.setFormSize(6f);
+            mLegend.setTextColor(Color.WHITE);
+//      mLegend.setTypeface(mTf);
+
+            lineChart.animateX(2500);
+        }
+        private LineData getLineData(int count, float range) {
+            ArrayList<String> xValues = new ArrayList<String>();
+            for (int i = 0; i < count; i++) {
+
+                xValues.add("" + i);
+            }
+
+
+            ArrayList<Entry> yValues = new ArrayList<Entry>();
+
+            for (int i = 0; i < count; i++) {
+                float value = (float) (i*20);//(float) (Math.random() * range) + 3;
+                yValues.add(new Entry(value, i));
+            }
+
+            // create a dataset and give it a type
+
+            LineDataSet lineDataSet = new LineDataSet(yValues, "test line chart" );
+            // mLineDataSet.setFillAlpha(110);
+            // mLineDataSet.setFillColor(Color.RED);
+
+
+            lineDataSet.setLineWidth(1.75f);
+            lineDataSet.setCircleSize(3f);
+            lineDataSet.setColor(Color.WHITE);
+            lineDataSet.setCircleColor(Color.WHITE);
+            lineDataSet.setHighLightColor(Color.WHITE);
+
+            ArrayList<LineDataSet> lineDataSets = new ArrayList<LineDataSet>();
+            lineDataSets.add(lineDataSet); // add the datasets
+
+            // create a data object with the datasets
+            LineData lineData = new LineData(xValues, lineDataSets);
+
+            return lineData;
         }
     }
 }
