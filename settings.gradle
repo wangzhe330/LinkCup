@@ -1,0 +1,2 @@
+include ':app', ':CircularFloatingActionMenu'
+project(':CircularFloatingActionMenu').projectDir = new File('library')
