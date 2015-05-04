@@ -19,8 +19,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -321,14 +325,16 @@ public class MainActivity extends ActionBarActivity
             //chart.invalidate();
             //LineData water_data = getLineData(36,100);
             LineData mLineData = getLineData(24, 100);
-            showChart(chart, mLineData, Color.rgb(26, 188, 156));//rgb(26, 188, 156)rgb(114, 188, 223)
+            showChart(chart, mLineData,Color.rgb(52, 73, 94));//rgb(26, 188, 156)rgb(114, 188, 223)
 
-
+            BarChart mBarChart = (BarChart)rootView.findViewById(R.id.chart_bar);
+            BarData mBarData =getBarData(24,100);
+            showBarChart(mBarChart,mBarData,Color.rgb(52, 73, 94));
             return rootView;
         }
         //set style
         private void showChart(LineChart lineChart, LineData lineData, int color) {
-            lineChart.setDrawBorders(false);
+            lineChart.setDrawBorders(true);
 
             // no description text
             lineChart.setDescription("");
@@ -340,15 +346,13 @@ public class MainActivity extends ActionBarActivity
             lineChart.setGridBackgroundColor(Color.WHITE & 0x70FFFFFF);
 
             // enable touch gestures
-            lineChart.setTouchEnabled(true);
+            lineChart.setTouchEnabled(false);
 
             // enable scaling and dragging
             lineChart.setDragEnabled(true);
-            lineChart.setScaleEnabled(true);
-
+            lineChart.setScaleEnabled(false);
             // if disabled, scaling can be done on x- and y-axis separately
             lineChart.setPinchZoom(false);//
-
             lineChart.setBackgroundColor(color);
 
             // add data
@@ -359,6 +363,7 @@ public class MainActivity extends ActionBarActivity
 
             // modify the legend ...
             // mLegend.setPosition(LegendPosition.LEFT_OF_CHART);
+            //mLegend.setForm(Legend.LegendForm.CIRCLE);
             mLegend.setForm(Legend.LegendForm.CIRCLE);
             mLegend.setFormSize(6f);
             mLegend.setTextColor(Color.WHITE);
@@ -401,6 +406,53 @@ public class MainActivity extends ActionBarActivity
             LineData lineData = new LineData(xValues, lineDataSets);
 
             return lineData;
+        }
+        private void showBarChart(BarChart barChart,BarData barData,int color){
+            barChart.setDrawBorders(false);
+            barChart.setDescription("");
+            barChart.setNoDataText("there is no data");
+            barChart.setTouchEnabled(false);
+            barChart.setDragEnabled(false);
+            barChart.setScaleEnabled(false);
+            barChart.setPinchZoom(false);
+            barChart.setDrawGridBackground(false);
+            barChart.setBackgroundColor(color);
+
+            //barChart.setBackground();
+            barChart.setDrawBarShadow(false);
+            barChart.setData(barData);
+
+            Legend mLegend = barChart.getLegend();
+            mLegend.setForm(Legend.LegendForm.CIRCLE);
+            mLegend.setFormSize(6f);
+            mLegend.setTextColor(Color.WHITE);
+
+            barChart.animateX(2500);
+        }
+        private BarData getBarData(int count,float range){
+            ArrayList<String> xValues = new ArrayList<String>();
+            for (int i = 0; i < count; i++) {
+                xValues.add("" + i);
+            }
+
+            ArrayList<BarEntry> yValues = new ArrayList<BarEntry>();
+
+            for (int i = 0; i < count; i++) {
+                float value = (float) (Math.random() * range) + 3;
+                yValues.add(new BarEntry(value, i));
+            }
+
+
+            BarDataSet barDataSet = new BarDataSet(yValues, "bar chart test");
+
+            barDataSet.setColor(Color.rgb(114, 188, 223));
+
+            ArrayList<BarDataSet> barDataSets = new ArrayList<BarDataSet>();
+            barDataSets.add(barDataSet); // add the datasets
+
+            BarData barData = new BarData(xValues, barDataSets);
+
+            return barData;
         }
     }
 }
